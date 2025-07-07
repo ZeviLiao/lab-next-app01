@@ -1,37 +1,11 @@
 "use client";
 
 import styles from "./page.module.css";
-import { useQuery, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import axios from "axios";
-import React from "react";
+import React, { Suspense } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
-
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function PostsList() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["posts"],
-    queryFn: async () => {
-      const res = await axios.get("https://jsonplaceholder.typicode.com/posts");
-      await sleep(2000); // 強制延遲 2 秒
-      return res.data;
-    },
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
-  return (
-    <ul>
-      {data.map((post: { id: number; title: string }) => (
-        <li key={post.id}>{post.title}</li>
-      ))}
-    </ul>
-  );
-}
+const PostsList = React.lazy(() => import("./PostsList"));
 
 export default function Home() {
   return (
@@ -39,7 +13,9 @@ export default function Home() {
       <div className={styles.page}>
         <main className={styles.main}>
           <h1>Posts List</h1>
-          <PostsList />
+          <Suspense fallback={<div>Loading...</div>}>
+            <PostsList />
+          </Suspense>
         </main>
       </div>
     </QueryClientProvider>
