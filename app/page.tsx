@@ -1,11 +1,8 @@
 import styles from "./page.module.css";
-import dynamic from "next/dynamic";
+import React, { Suspense } from "react";
 import Providers from "./Providers";
 
-const PostsList = dynamic(() => import("./PostsList"), {
-  loading: () => <div>Loading...</div>,
-  ssr: true,
-});
+const PostsList = React.lazy(() => import("./PostsList"));
 
 export default function Home() {
   return (
@@ -13,7 +10,9 @@ export default function Home() {
       <div className={styles.page}>
         <main className={styles.main}>
           <h1>Posts List</h1>
-          <PostsList />
+          <Suspense fallback={<div>Loading...</div>}>
+            <PostsList />
+          </Suspense>
         </main>
       </div>
     </Providers>
