@@ -1,27 +1,12 @@
-"use client";
-
 import styles from "./page.module.css";
-import { useQuery, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import axios from "axios";
-import React from "react";
 
-const queryClient = new QueryClient();
-
-function PostsList() {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["posts"],
-    queryFn: async () => {
-      const res = await axios.get("https://jsonplaceholder.typicode.com/posts");
-      return res.data;
-    },
-  });
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-
+async function PostsList() {
+  const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+  if (!res.ok) return <div>Error: {res.statusText}</div>;
+  const data = (await res.json()) as { id: number; title: string }[];
   return (
     <ul>
-      {data.map((post: { id: number; title: string }) => (
+      {data.map((post) => (
         <li key={post.id}>{post.title}</li>
       ))}
     </ul>
@@ -30,13 +15,11 @@ function PostsList() {
 
 export default function Home() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className={styles.page}>
-        <main className={styles.main}>
-          <h1>Posts List</h1>
-          <PostsList />
-        </main>
-      </div>
-    </QueryClientProvider>
+    <div className={styles.page}>
+      <main className={styles.main}>
+        <h1>Posts List</h1>
+        <PostsList />
+      </main>
+    </div>
   );
 }
