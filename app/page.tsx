@@ -7,11 +7,16 @@ import React from "react";
 
 const queryClient = new QueryClient();
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function PostsList() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
       const res = await axios.get("https://jsonplaceholder.typicode.com/posts");
+      await sleep(2000); // 強制延遲 2 秒
       return res.data;
     },
   });
